@@ -1,0 +1,62 @@
+#### BASIC CONFIGURATION ####
+
+ncmpcpp_directory = "~/.ncmpcpp"
+mpd_music_dir = "/home/Jupiter/Music"
+lyrics_directory = "~/.config/ncmpcpp/lyrics"
+#mpd_host = "192.168.1.11"
+#mpd_port = "6600"
+system_encoding = "utf-8"
+
+
+# Interfaz:
+user_interface = 						"alternative"
+alternative_header_first_line_format = 	"$(white)─┤ $b$(magenta)%a$(end)$/b ├─$(end)"
+alternative_header_second_line_format =	"$(16)%t (%y)$(end)"
+alternative_ui_separator_color = 		"cyan"
+
+#startup_screen = "playlist"
+#startup_slave_screen = "media_library"
+
+#locked_screen_width_part = 50
+#ask_for_locked_screen_width_part = no
+
+
+# Formato de canción:
+song_columns_list_format = 				"$L (7)[white]{n} $1│$7 (30)[magenta]{a} $1│$7 (30)[white]{b} $1│$7 (30)[magenta]{t} $1│$7 (10)[white]{l}"
+now_playing_prefix = 					"$b$8»$2»$4»$3» "
+centered_cursor = 						"no"
+cyclic_scrolling = 						"yes"
+mouse_list_scroll_whole_page = 			"no"
+
+# Varias configuraciones:
+autocenter_mode = 						"yes"
+#display_bitrate = 						"yes"
+header_visibility = 					"yes"
+statusbar_visibility = 					"yes"
+progressbar_look = 						"─╼─"
+
+
+# Visualizador de música:
+visualizer_output_name = 				"FIFO"
+visualizer_in_stereo = 					"yes"
+visualizer_fifo_path = 					"/tmp/mpd.fifo"
+visualizer_sync_interval = 				"11"
+#visualizer_type = 						"spectrum"
+#visualizer_type = 						"ellipse"
+#visualizer_type = 						"wave_filled"
+visualizer_type = 						"wave"
+visualizer_look = 						"▋▋"
+
+
+# Color:
+color1 = 								"white"
+color2 = 								"red"
+discard_colors_if_item_is_selected = 	"yes"
+main_window_color = 					"white"
+header_window_color = 					"4"
+progressbar_color = 					"cyan"
+statusbar_color = 						"red"
+#active_column_color = 					"white"
+volume_color = 							"4"
+window_border_color = 					"white"
+active_window_border = 					"4"
