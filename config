@@ -1,0 +1,234 @@
+# I3 Config File
+
+set $sys Mod4
+set $alt Mod1
+
+## General
+#font pango:xos4 Terminus 8
+focus_follows_mouse yes
+floating_modifier $sys
+workspace_auto_back_and_forth yes
+for_window [class=".*"] border pixel 2
+
+## Gaps
+#smart_gaps on
+gaps inner 15
+gaps outer 5
+
+
+## Keybindings
+# launch terminal
+bindsym $sys+Return exec "i3-sensible-terminal"
+# application launcher
+bindsym $sys+d exec dmenu_run -fn 'xos4 Terminus:pixelsize=15' -l 3 -nf '#707880' -sf '#cc6666' -nb '#1d1f21' -sb '#1d1f21'
+# file navigator
+bindsym $sys+w exec --no-startup-id "i3-sensible-terminal -title 'Ranger' -e 'ranger'"
+# text editor
+bindsym $sys+e exec --no-startup-id "i3-sensible-terminal -title 'Vim' -e 'vim'"
+# ipython calcuator
+bindsym $sys+x exec --no-startup-id "i3-sensible-terminal -title 'ipyCalc' -e 'ipython'"
+# LaTex editor
+bindsym $sys+t exec "texstudio"
+# web browser
+bindsym $sys+b exec "firefox"
+bindsym $sys+Shift+b exec "firefox --private-window"
+# play web videos in mpv
+bindsym $sys+g exec --no-startup-id "/usr/local/bin/WebVideoMPV.sh"
+# music player
+# bindsym XF86Tools exec --no-startup-id "i3-sensible-terminal -title 'ncmpcpp' -e 'ncmpcpp'"
+# music player, don't blank screen
+bindsym XF86Tools exec --no-startup-id "SwitchBlanking.sh -0; i3-sensible-terminal -title 'ncmpcpp' -e 'ncmpcpp'"
+# neofetch
+bindsym $sys+n exec --no-startup-id "i3-sensible-terminal -hold -geometry 78x25 -e 'neofetch'"
+# screenshots
+bindsym --release Print exec "scrot -s -z '%y_%m_%d-%H_%M_%S.png' -e 'mv $f ~/Pictures/Screenshots'"
+bindsym $sys+Print exec "scrot -z '%y_%m_%d-%H_%M_%S.png' -e 'mv $f ~/Pictures/Screenshots'"
+# screen blanking
+bindsym $sys+F12 exec "SwitchBlanking.sh -s"
+bindsym $sys+Shift+F12 exec "SwitchBlanking.sh -0"
+bindsym $sys+Shift+$alt+F12 exec "SwitchBlanking.sh -1"
+# shutdown reboot
+bindsym $alt+End exec "shutdown now"
+bindsym $alt+Home exec "reboot"
+
+## Window focus
+bindsym $sys+Left focus left
+bindsym $sys+Down focus down
+bindsym $sys+Up focus up
+bindsym $sys+Right focus right
+
+## Window move
+bindsym $sys+Shift+Left move left
+bindsym $sys+Shift+Down move down
+bindsym $sys+Shift+Up move up
+bindsym $sys+Shift+Right move right
+
+## Resize window
+bindsym $alt+Left resize shrink width 10 px or 10 ppt
+bindsym $alt+Down resize grow height 10 px or 10 ppt
+bindsym $alt+Up resize shrink height 10 px or 10 ppt
+bindsym $alt+Right resize grow width 10 px or 10 ppt
+
+## Tilling
+bindsym $alt+f fullscreen toggle
+bindsym $alt+q kill
+bindsym $alt+h split h
+bindsym $alt+v split v
+#bindsym $alt+s layout stacking
+#bindsym $alt+w layout tabbed
+#bindsym $alt+e layout toggle split
+bindsym $alt+Shift+space floating toggle
+bindsym $alt+space focus mode_toggle
+
+## Misc
+bindsym $alt+Shift+c reload
+bindsym $alt+Shift+r restart
+bindsym $alt+Shift+e exec --no-startup-id "i3-nagbar -t warning -m 'Do you really want to exit?' -b 'Yes' 'No'"
+
+## Scratchpad
+bindsym $sys+Shift+z move scratchpad
+bindsym $sys+z scratchpad show
+
+## Audio controls
+bindsym XF86AudioRaiseVolume exec --no-startup-id "amixer -Mq set Master,0 5%+ unmute"
+bindsym XF86AudioLowerVolume exec --no-startup-id "amixer -Mq set Master,0 5%- unmute"
+bindsym XF86AudioMute exec --no-startup-id "amixer -Mq set Master,0 toggle"
+#bindsym XF86AudioPlay exec "mpc -h 192.168.1.11 -p 6600 toggle"
+#bindsym XF86AudioStop exec "mpc -h 192.168.1.11 -p 6600 stop"
+#bindsym XF86AudioNext exec "mpc -h 192.168.1.11 -p 6600 next"
+#bindsym XF86AudioPrev exec "mpc -h 192.168.1.11 -p 6600 prev"
+bindsym XF86AudioPlay exec "mpc toggle"
+bindsym XF86AudioStop exec "mpc stop"
+bindsym XF86AudioNext exec "mpc next"
+bindsym XF86AudioPrev exec "mpc prev"
+# Add current song to favourites playlist
+bindsym $alt+XF86Tools exec --no-startup-id "/usr/local/bin/AddSongToFavsPlaylist.sh"
+
+# Workspace
+set $ws1 1
+set $ws2 2
+set $ws3 3
+set $ws4 4
+set $ws5 5
+set $ws6 6
+set $ws7 7
+set $ws8 8
+set $ws9 9
+set $ws10 10
+set $ws11 11
+set $ws12 12
+set $ws13 13
+set $ws14 14
+set $ws15 15
+set $ws16 16
+set $ws17 17
+set $ws18 18
+set $ws19 19
+set $ws20 20
+
+## Switch to workspace
+bindsym $sys+1 workspace $ws1
+bindsym $sys+2 workspace $ws2
+bindsym $sys+3 workspace $ws3
+bindsym $sys+4 workspace $ws4
+bindsym $sys+5 workspace $ws5
+bindsym $sys+6 workspace $ws6
+bindsym $sys+7 workspace $ws7
+bindsym $sys+8 workspace $ws8
+bindsym $sys+9 workspace $ws9
+bindsym $sys+0 workspace $ws10
+bindsym $sys+F1 workspace $ws11
+bindsym $sys+F2 workspace $ws12
+bindsym $sys+F3 workspace $ws13
+bindsym $sys+F4 workspace $ws14
+bindsym $sys+F5 workspace $ws15
+bindsym $sys+F6 workspace $ws16
+bindsym $sys+F7 workspace $ws17
+bindsym $sys+F8 workspace $ws18
+bindsym $sys+F9 workspace $ws19
+bindsym $sys+F10 workspace $ws20
+bindsym $sys+a workspace $ws100
+
+## Move focused container to workspace
+bindsym $sys+Shift+1 move container to workspace $ws1
+bindsym $sys+Shift+2 move container to workspace $ws2
+bindsym $sys+Shift+3 move container to workspace $ws3
+bindsym $sys+Shift+4 move container to workspace $ws4
+bindsym $sys+Shift+5 move container to workspace $ws5
+bindsym $sys+Shift+6 move container to workspace $ws6
+bindsym $sys+Shift+7 move container to workspace $ws7
+bindsym $sys+Shift+8 move container to workspace $ws8
+bindsym $sys+Shift+9 move container to workspace $ws9
+bindsym $sys+Shift+0 move container to workspace $ws10
+bindsym $sys+Shift+F1 move container to workspace $ws11
+bindsym $sys+Shift+F2 move container to workspace $ws12
+bindsym $sys+Shift+F3 move container to workspace $ws13
+bindsym $sys+Shift+F4 move container to workspace $ws14
+bindsym $sys+Shift+F5 move container to workspace $ws15
+bindsym $sys+Shift+F6 move container to workspace $ws16
+bindsym $sys+Shift+F7 move container to workspace $ws17
+bindsym $sys+Shift+F8 move container to workspace $ws18
+bindsym $sys+Shift+F9 move container to workspace $ws19
+bindsym $sys+Shift+F0 move container to workspace $ws20
+
+
+# Color
+set $unfocused_border #1d1f21
+set $focused_border #cc6666
+
+# class			border	backgr.	text	indic.	child_border
+client.focused		#ffffff	#ffffff	#ffffff	#ffffff	$focused_border
+client.focused_inactive	#ffffff	#ffffff	#ffffff	#ffffff	$focused_border
+client.unfocused	#ffffff	#ffffff	#ffffff	#ffffff	$unfocused_border
+client.urgent		#ffffff	#ffffff	#ffffff	#ffffff	$focused_border
+client.placeholder	#ffffff	#ffffff	#ffffff	#ffffff	$focused_border
+
+client.background	#ffffff
+
+# set_from_resource $fg i3wm.color7 #f0f0f0
+# set_from_resource $bg i3wm.color2 #f0f0f0
+# 
+# # class                 border  backgr. text indicator child_border
+# client.focused          $bg     $bg     $fg  $bg       $bg
+# client.focused_inactive $bg     $bg     $fg  $bg       $bg
+# client.unfocused        $bg     $bg     $fg  $bg       $bg
+# client.urgent           $bg     $bg     $fg  $bg       $bg
+# client.placeholder      $bg     $bg     $fg  $bg       $bg
+# 
+# client.background       $bg
+
+# Container configuration
+# To find an application's window class:
+# run xprop in the terminal and then select second window class
+for_window [window_role="pop-up"] floating enabled
+for_window [window_role="task_dialog"] floating enabled
+
+for_window [title="(?i)subl-build-term"] floating enabled
+for_window [class="(?i)matplotlib"] floating enabled
+for_window [title="(?i)neofetch"] floating enabled
+for_window [title="ipyCalc"] floating enabled
+
+assign [class="(?i)gimp"] 5
+
+assign [class="(i?)libreoffice"] 6
+assign [class="(?i)texstudio"] 6
+
+assign [class="(?i)deluge"] 10
+assign [class="(?i)mpv"] 11
+for_window [class="(?i)mpv"] workspace $ws11
+assign [title="(?i)ncmpcpp"] 12
+
+# Startup
+## Startup with every reload
+exec_always --no-startup-id "xsetwacom set 'Wacom Bamboo Connect Pen stylus' MapToOutput HEAD-0"
+exec_always --no-startup-id "wal -R"
+exec_always --no-startup-id "xrdb $HOME/.Xresources"
+exec_always --no-startup-id "mpd --kill; mpd"
+exec_always --no-startup-id "yams"
+exec_always --no-startup-id "$HOME/.config/polybar/launch.sh"
+
+# Scratchpaded Applications
+#exec --no-startup-id "i3-sensible-terminal -name 'Lookup'"
+#for_window [class="^URxvt$" instance="^Lookup$"] floating enable
+#for_window [class="^URxvt$" instance="^Lookup$"] resize set 625 400
+#for_window [class="^URxvt$" instance="^Lookup$"] move scratchpad
