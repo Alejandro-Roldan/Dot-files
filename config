@@ -1,0 +1,440 @@
+;==========================================================
+;
+;
+;   ██████╗  ██████╗ ██╗  ██╗   ██╗██████╗  █████╗ ██████╗
+;   ██╔══██╗██╔═══██╗██║  ╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
+;   ██████╔╝██║   ██║██║   ╚████╔╝ ██████╔╝███████║██████╔╝
+;   ██╔═══╝ ██║   ██║██║    ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗
+;   ██║     ╚██████╔╝███████╗██║   ██████╔╝██║  ██║██║  ██║
+;   ╚═╝      ╚═════╝ ╚══════╝╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+;
+;
+;   To learn more about how to configure Polybar
+;   go to https://github.com/jaagr/polybar
+;
+;   The README contains a lot of information
+;
+;==========================================================
+
+[colors]
+background = #222
+foreground = #eee
+linecolor = #fba922
+bordercolor = #333
+accent = #e60053
+
+
+;----------------------------------------------------------
+[bar/parent]
+;-------;
+; FONTS ;
+;-------;
+
+font-0 = xos4 Terminus:pixelsize=10;1
+font-1 = Siji:pixelsize=14;1
+;font-2 = uniont:size=8;1
+;font-3 = FontAwesome:size=12
+
+;------------;
+; DIMENSIONS ;
+;------------;
+
+width = 100%
+height = 24
+
+;----------;
+; POSITION ;
+;----------;
+
+bottom = false
+;wm-restack = i3
+override-redirect = false
+
+
+;--------;
+; COLORS ;
+;--------;
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+
+;---------------;
+; MISCELLANEOUS ;
+;---------------;
+
+fixed-center = true
+padding-left = 0
+padding-right = 2
+module-margin-left = 1
+module-margin-right = 2
+
+line-color = ${colors.linecolor}
+underline-size = 1
+overine-size = 2
+
+border-bottom-color = ${colors.bordercolor}
+border-bottom-size = 0
+
+cursor-click = pointer
+cursor-scroll = ns-resize
+
+
+;-----------------------------------------------------------
+[bar/upper]
+inherit = bar/parent
+
+;---------------;
+; MISCELLANEOUS ;
+;---------------;
+
+border-bottom-size = 2
+
+modules-left = mpd xwindow
+;modules-left = mpd
+modules-center = i3
+modules-right = wlan date pulseaudio temperature cpu memory powermenu
+
+;----------------------------------------------------------
+[bar/base]
+inherit = bar/parent
+
+;----------;
+; POSITION ;
+;----------;
+
+monitor = ${env:MONITOR:HDMI-0}
+
+
+;---------------;
+; MISCELLANEOUS ;
+;---------------;
+
+border-bottom-size = 2
+
+modules-left =
+modules-center = i3
+modules-right = alsa date
+
+;tray-position = left
+;tray-padding = 4
+;tray-maxsize = 16
+;tray-background = #0063ff
+
+
+;-----------------------------------------------------------
+;---------;
+; MODULES ;
+;---------;
+
+[module/i3]
+type = internal/i3
+index-sort = true
+pin-workspaces = false
+wrapping-scroll = true
+
+ws-icon-0 = 1;
+ws-icon-1 = 4;
+ws-icon-2 = 5;
+ws-icon-3 = 6;
+ws-icon-4 = 11;
+ws-icon-5 = 12;
+ws-icon-default = 
+
+format = <label-state> <label-mode>
+
+label-mode = %mode%
+label-mode-padding = 2
+label-mode-background = ${colors.accent}
+
+label-focused = %index%: %icon%
+label-focused-background = #383838
+label-focused-foreground = #fff
+;label-focused-overline= ${root.bspwm-focused-overline}
+;label-focused-underline= ${root.bspwm-focused-underline}
+label-focused-padding = 2
+
+label-unfocused = %index%: %icon%
+label-unfocused-padding = 2
+
+label-urgent = %index%: %icon%!
+label-urgent-background = #bd2c40
+label-urgent-padding = 2
+
+label-visible = %index%: %icon%
+label-visible-padding = 2
+
+;-------------------------------------------------------------
+[module/xwindow]
+type = internal/xwindow
+label = %title:0:100:...%
+
+
+;----------------------------------------------------------
+[module/xkeyboard]
+type = internal/xkeyboard
+blacklist-0 = num lock
+
+format-prefix = " "
+format-prefix-foreground = ${colors.foreground-alt}
+format-prefix-underline = ${colors.secondary}
+
+label-layout = %layout%
+label-layout-underline = ${colors.secondary}
+
+label-indicator-padding = 2
+label-indicator-margin = 1
+label-indicator-background = ${colors.secondary}
+label-indicator-underline = ${colors.secondary}
+
+
+;------------------------------------------------------------------
+[module/date]
+type = internal/date
+interval = 5
+
+date =
+date-alt = %{F#e60053}%{F-} %Y-%m-%d
+
+time = %H:%M
+time-alt = %H:%M
+
+label = %date% %{F#e60053}%{F-} %time%
+
+
+;-------------------------------------------------------------------
+[module/cpu]
+type = internal/cpu
+interval = 2
+format-prefix = " "
+format-prefix-foreground = #666
+label = %{A1:i3-sensible-terminal -e 'htop':}%percentage%%%{A}
+
+
+;-----------------------------------------------------------------
+[module/memory]
+type = internal/memory
+interval = 2
+format-prefix = " "
+format-prefix-foreground = #666
+label = %{A1:i3-sensible-terminal -e 'htop':}%percentage_used%%%{A}
+
+
+;----------------------------------------------------------------
+[module/temperature]
+type = internal/temperature
+thermal-zone = 0
+
+format = <ramp> <label>
+format-underline = #f50a4d
+format-warn = <label-warn>
+format-warn-underline = ${self.format-underline}
+
+label = %temperature-c%
+; Temperatur-high
+label-warn =  %temperature-c%
+;label-warn-foreground = ${colors.secondary}
+label-warn-foreground = #e60053
+
+; Base temp for where to start the ramp
+base-temperature = 45
+; Threshold temp to display warning label
+warn-temperature = 75
+
+ramp-0 = 
+ramp-1 = 
+ramp-2 = 
+
+ramp-foreground = #666
+
+
+;-------------------------------------------------------------------
+[module/wlan]
+type = internal/network
+interface = wlan0
+interval = 3.0
+
+;local_ip = %local_ip%
+;local_ip-alt = %local_ip%
+;downspeed = 
+;downspeed-alt = %downspeed:7%
+;upspeed = 
+;upspeed-alt = %upspeed:7%
+
+format-connected = %{A3:i3-sensible-terminal -e 'nmtui':} <ramp-signal> <label-connected>%{A}
+;format-connected-prefix = " "
+;format-connected-prefix-foreground = #666
+;format-connected-prefix-offset = -6
+label-connected = %local_ip% %downspeed:7% %upspeed:7%
+;label-connected = %local_ip% %downspeed% %upspeed%
+
+ramp-signal-0 = 
+ramp-signal-1 = 
+ramp-signal-2 = 
+ramp-signal-3 = 
+ramp-signal-4 = 
+ramp-signal-foreground = #666
+
+
+;-------------------------------------------------------------------
+[module/eth]
+type = internal/network
+interface = eth0
+interval = 3.0
+
+format-connected-prefix = " "
+format-connected-prefix-foreground = #666
+label-connected = %local_ip%
+
+
+;-------------------------------------------------------------
+[module/filesystem]
+type = internal/fs
+interval = 25
+
+mount-0 = /
+
+label-mounted = %{F#0a81f5}%mountpoint%%{F-}: %percentage_used%%
+label-unmounted = %mountpoint% not mounted
+
+
+;------------------------------------------------------------------
+[module/pulseaudio]
+type = internal/pulseaudio
+sink = combined
+
+use-ui-max = false
+interval = 5
+
+format-volume = %{A4:amixer -Mq set Master,0 5%+ unmute:}%{A5:amixer -Mq set Master,0 5%+ unmute:}%{A2:i3-sensible-terminal -e 'pulsemixer':}<ramp-volume> <bar-volume>%{A}%{A}%{A}
+
+label-volume = VOL
+label-volume-foreground = ${root.foreground}
+
+format-muted-prefix = " "
+format-muted-foreground = #777
+label-muted = sound muted
+
+bar-volume-width = 10
+bar-volume-foreground-0 = #55aa55
+bar-volume-foreground-1 = #55aa55
+bar-volume-foreground-2 = #55aa55
+bar-volume-foreground-3 = #55aa55
+bar-volume-foreground-4 = #55aa55
+bar-volume-foreground-5 = #f5a70a
+bar-volume-foreground-6 = #ff5555
+bar-volume-gradient = false
+bar-volume-indicator = |
+bar-volume-indicator-font = 2
+bar-volume-fill = ─
+bar-volume-fill-font = 2
+bar-volume-empty = ─
+bar-volume-empty-font = 2
+bar-volume-empty-foreground = ${colors.foreground}
+
+ramp-volume-0 = 
+ramp-volume-1 = 
+ramp-volume-2 = 
+ramp-volume-3 = 
+ramp-volume-foreground = #666
+
+
+;------------------------------------------------------------------
+[module/alsa]
+type = internal/alsa
+
+format-volume = %{A4:amixer -Mq set Master,0 5%+ unmute:}%{A5:amixer -Mq set Master,0 5%+ unmute:}%{A2:i3-sensible-terminal -e 'pulsemixer':}<ramp-volume> <bar-volume>%{A}%{A}%{A}
+label-volume = VOL
+label-volume-foreground = ${root.foreground}
+
+format-muted-prefix = " "
+format-muted-foreground = #777
+label-muted = sound muted
+
+bar-volume-width = 10
+bar-volume-foreground-0 = #55aa55
+bar-volume-foreground-1 = #55aa55
+bar-volume-foreground-2 = #55aa55
+bar-volume-foreground-3 = #55aa55
+bar-volume-foreground-4 = #55aa55
+bar-volume-foreground-5 = #f5a70a
+bar-volume-foreground-6 = #ff5555
+bar-volume-gradient = false
+bar-volume-indicator = |
+bar-volume-indicator-font = 2
+bar-volume-fill = ─
+bar-volume-fill-font = 2
+bar-volume-empty = ─
+bar-volume-empty-font = 2
+bar-volume-empty-foreground = ${colors.foreground}
+
+ramp-volume-0 = 
+ramp-volume-1 = 
+ramp-volume-2 = 
+ramp-volume-3 = 
+ramp-volume-foreground = #666
+
+
+;------------------------------------------------------------------
+[module/mpd]
+type = internal/mpd
+
+format-online = <label-time> %{F#88}|%{F-} <label-song> <icon-prev><icon-stop><toggle><icon-next>
+format-online-spacing = 0
+format-online-background = #ee333333
+format-online-underline = #cc333333
+format-online-padding = 3
+
+format-offline = MPD is offline
+format-offline-foreground = #777
+
+icon-prev = 
+icon-stop = 
+icon-play = 
+icon-pause = 
+icon-next = 
+
+icon-random = 
+icon-repeat = 
+
+toggle-on-foreground = ${colors.accent}
+toggle-off-foreground = #777
+
+
+;-----------------------------------------------------------------
+[module/powermenu]
+type = custom/menu
+
+expand-right = false
+
+format-spacing = 1
+
+label-open = 
+label-close = 
+label-separator = ||
+label-separator-margin = 1
+
+;menu-0-0 = Supend
+;menu-0-0-foreground = ${colors.accent}
+;menu-0-0-exec = systemctl suspend
+menu-0-0 = Reboot
+menu-0-0-foreground = ${colors.accent}
+menu-0-0-exec = reboot
+menu-0-1 = Shutdown
+menu-0-1-foreground = ${colors.accent}
+menu-0-1-exec = shutdown now
+
+
+;-----------------------------------------------------------------
+;----------;
+; SETTINGS ;
+;----------;
+[settings]
+screenchange-reload = true
+pseudo-transparency = true
+
+
+;-----------------------------------------------------------------
+[global/wm]
+margin-top = 0
+margin-bottom = 0
