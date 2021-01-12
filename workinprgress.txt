@@ -1,0 +1,403 @@
+#################################################
+#						#
+#	RASPBERRY PI ARCH LINUX INSTALLATION	#
+#						#
+#################################################
+
+###########################
+#### INSTALLING THE OS ####
+###########################
+
+# Start by connecting the sd card to your computer and cheking what device it is (/dev/sdX) and making sure that its unmounted and unmount it otherwise
+fdisk /dev/sdX
+# Type o. This will clear out any partitions on the drive.
+# Type p to list partitions. There should be no partitions left. 
+# Type n, then p for primary, 1 for the first partition on the drive, press ENTER to accept the default first sector, then type +100M for the last sector.
+# Type t, then c to set the first partition to type W95 FAT32 (LBA).
+# Type n, then p for primary, 2 for the second partition on the drive, and then press ENTER twice to accept the default first and last sector.
+# Write the partition table and exit by typing w.
+
+
+# Create and mount the FAT filesystem
+mkfs.vfat /dev/sdX1
+mkdir boot
+mount /dev/sdX1 boot
+
+
+# Create and mount the ext4 filesystem
+mkfs.ext4 /dev/sdX2
+mkdir root
+mount /dev/sdX2 root
+
+
+# Download and extract the root filesystem (as root, not via sudo):
+wget http://os.archlinuxarm.org/os/ArchLinuxARM-rpi-4-latest.tar.gz
+# Thats the link for armv7l for raspberry 4
+# For AArch64 raspberry 3: http://os.archlinuxarm.org/os/ArchLinuxARM-rpi-3-latest.tar.gz
+# Other versions are avaible at http://os.archlinuxarm.org
+
+# Now use the version you downloaded
+bsdtar -xpf ArchLinuxARM-rpi-4-latest.tar.gz -C root
+sync
+
+# Move boot files to the first partition:
+mv root/boot/* boot
+
+# Unmount the two partitions:
+umount boot root
+
+
+# Insert the SD card into the Raspberry Pi, connect ethernet, and apply 5V power.
+# You can now connect to the board via SSH
+	# Default user alarm with password alarm
+	# default root passwrod root
+
+# Initialize the pacman keyring and populate the Arch Linux ARM package signing keys:
+pacman-key --init
+pacman-key --populate archlinuxarm
+
+
+################################
+#### CONFIGURING THE SYSTEM ####
+################################
+
+# Need to login as root to be able to install anything because sudo is not installed yet, can't install from user without using sudo
+
+# Change keyboard
+loadkeys es
+
+# NECESSARY. Update the whole system.
+pacman -Syu
+
+# Need to install base-devel to be able to compile packages (it has all the packages neede for that + sudo + others really useful) vim to be able to edit sudoers file
+pacman -S base-devel vim
+
+
+
+#### RASPBERRY PI BOOT CONFIGURATION ####
+
+# We do this here so next time we have to reboot it already takes place and we don't have to reboot again just for this
+
+# Edit the boot config. Output audio, use the whole screen, set gpio...
+sudo nano /boot/config.txt
+	# To remove the black sides and use full resolution
+	disable_overscan=1
+
+	# Allow (some)hardware acceleration
+	dtoverlay=vc4-fkms-v3d
+	# other options are: vc4-kms-v3d or vc4-kms-v3d-pi4
+	# Allow sound
+	dtparam=audio=on
+
+	# Overclosking (numbers for RPi 4)
+	arm_freq=2000
+	gpu_freq=750
+	over_voltage=6
+	disable_splash=1
+
+
+
+#### USER CONFIGURATION ####
+
+# Since we are logged as root lets do the user changes first and the change the hostname later. That way we only need to reboot once
+
+# Add a new user in group wheel with /bin/bash as default Unix Shell
+useradd -m -G wheel -s /bin/bash leptope
+
+# Give users of group wheel permission to use sudo by uncommenting %wheel ALL = (ALL) ALL
+# CAN'T DO IT WITH NANO. Could have catastrophic consequences (or so im told)
+vim /etc/sudoers
+
+# Change newly created user(s) password
+passwd <User>
+
+# Delete the alarm user and it's home directory
+deluser --remove-home alarm
+
+
+
+#### NETWORK CONFIGURATION ####
+
+echo <MachineName> > /etc/hostname    # creates a hostname
+nano /etc/hosts
+        127.0.0.1       localhost.localdomain		localhost
+        ::1             localhost.localdomain		localhost
+        127.0.1.1       <MachineName>.localdomain     <MachineName>
+
+# Change roots password
+passwd root
+
+# And now need to reboot for this to take effect and be able to do anything else
+reboot
+
+
+
+#### LOCALIZATION ####
+
+# Set timezone
+ln -sf /usr/share/zoneinfo/Europe/Madrid /etc/localtime
+
+# Change the system language. Uncomment the ones you want
+nano /etc/locale.gen
+locale-gen
+
+echo LANG=en_GB.UTF-8 > /etc/locale.conf
+export LANG=en_GB.UTF-8
+
+# Set keyboard permanently inside the terminal (not inside the xwindow)
+echo KEYMAP=es > /etc/vconsole.conf
+
+
+
+#### VISUAL ENVIROMENT ####
+
+# If youre gonna use an xwindow interface you need video drivers
+sudo pacman -S xf86-video-fbdev
+# Could also use xf86-video-fbturbo
+# And I guess there are more options
+
+# Xwindows enviroment
+sudo pacman -S xorg xorg-init i3 rxvt-unicode
+
+# To launch i3 when running xorg
+vim ~/.xinit
+	#!/bin/bash
+
+	exec i3
+
+# To automatically launch xorg after logging on tty1
+sudo nano /etc/profile
+        if [[ "$(tty)" == '/dev/tty1' ]]; then
+                exec startx -- -keeptty &> ~/.local/share/xorg/Xorg.0.log
+        fi
+
+# Create the log directory if it doesn't exists
+mkdir -p ~/.local/share/xorg
+
+# Now you can copy your i3 configuration to ~/.config/i3
+
+# While inside the xwindows you can temporalily change the keyboard with
+xkbmap es
+
+# Setting Xorg keyboard layout permanently
+sudo nano /etc/X11/xorg.conf.d/00-keyboard.conf
+        Section "InputClass"
+                Identifier      "system-keyboard"
+                MatchIsKeyboard "on"
+                Option "XkbLayout"      "es"
+                Option "XkbModel"       "pc105"
+                Option "XkbVariant"     ""
+        EndSection
+
+
+#### INSTALLING PACKAGES ####
+
+# Now lets install the packages that we use
+
+# For a terminal enviroment
+sudo pacman -S python python-pip expac yajl git networkmanager nmap
+
+# Plus the extras for a visual enviroment
+sudo pacman -S terminus-font feh imagemagick ranger w3m xclip scrot firefox pulseaudio htop mpv neofetch texlive-most texstudio deluge-gtk
+# For python libraries they need to be compiled in arm architecture and many pip packages use dependencies of prebuilt packages
+# so you need to install them with pacman
+sudo pacman -S python-numpy python-matplotlib python-sympy python-scipy
+sudo pip install wheel pywal ipython
+
+# Set the wallpaper
+wal -i '/path/to/the/image'
+
+# To install polybar and siji font need to do it with git
+# From http://os.archlinux.org/polybar.git for polybar
+# And http://os.archlinux.org/polybar.git for siji
+# Done this way:
+
+# Create the directory
+sudo mkdir -p /tmp/<package>
+# Move to that directory
+cd /tmp/<package>
+
+# Clone the git repository
+git clone <repository-link>
+
+sudo chown <user> <repository-name>
+cd <repository-name>
+# You can do ls if youre not sure
+
+# And build
+makepkg -si
+
+# You may need to edit the build file to add armv7h to the list of accepted architectures
+
+# Edit the configuration files how you want. May also bring the ones you have from another computer/system
+
+
+## MUSIC ##
+
+# Install the needed packages
+sudo pacman -S mpd mpc
+sudo pip install YAMScrobbler
+
+# And on the client
+sudo pacman -S ncmpcpp paprefs pavucontrol
+
+# With paprefs and pavucontrol installed you can easilly set up the sound outputs
+# Even virtual output through both sound cards
+
+# Snapcast through git (best sound synchronization so far)
+# But snapcast gives the same cpu load asrunning mpd itself, and when outputting the sound ouside of the hdmi
+# cable the quality considerably descends on all cards
+# Also can't get it to run on boot byitself and need to log into the server, launch snapserver and kill it
+# And on the client if i want audio outside the hdmi need to launch snapclient and cant do it deamonize nor
+# with & and can't close the window.
+# https://aur.archlinux.org/snapcast
+
+# Change/create the configuration files as needed
+
+## Using PulseAudio over network
+# To be able to use this on a server need to send the audio to the reciever
+# So add this to the server mpd configuration
+vim .config/mpf/mpd.conf
+	audio_output {
+		type	"pulse"
+		name	"Master-sound"
+		server	"<client_ip>"
+	}
+
+# And then uncomment the following line in the client pulseaudio configuration
+sudo vim /etc/pulse/default.pa
+	load-module module-native-protocol-tcp auth-ip-acl=<server_ip>
+
+## Using Snapcast
+# On the server side
+sudo systemctl enable snapserver
+# To use snapcast redirect the audio output to a snapfifo file
+vim ~/.config/mpd/mpd.conf
+	audio_output {
+	    type            "fifo"
+	    name            "OH SNAP"
+	    path            "/tmp/snapfifo"
+	    format          "48000:16:2"
+	    mixer_type      "software"
+	}
+
+# On the client side
+sudo systemctl enable snapclient
+
+
+## Using HTTP
+# For http streaming
+vim ~/.config/mpd/mpd.conf
+	# HTTP STREAMING
+	audio_output {
+		type		"httpd"
+		name		"My HTTP Stream"
+		encoder		"vorbis"		# optional
+		port		"8000"
+	#	quality		"5.0"			# do not define if bitrate is defined
+		bitrate		"320"			# do not define if quality is defined
+		format		"44100:16:2"
+		always_on       "yes"			# prevent MPD from disconnecting all listeners when playback is stopped.
+		tags            "yes"			# httpd supports sending tags to listening streams.
+	}
+
+
+##############################
+#### SYSTEM CONFIGURATION ####
+##############################
+
+# When booting the system may output constant info messages like systemd and dmesg. It does this for any event at any time which difficults the uso of the terminal and may make impossible to use ncurses applications.
+# To disable this (one of the options is) we need to create a systemd service that will run at startup and were we will put our command to make dmesg (the culprit of this messages) silent
+# To do so create an script
+sudo nano /usr/local/bin/startup.sh
+	#!/bin/bash
+
+	dmesg -D
+
+# In that script we may want to write other programs that we may want to run at startup
+# Keep in mind that it runs as root
+
+
+# To enable the use of more gettys
+sudo nano /etc/systemd/logind.conf
+	NAutoVTs=12
+
+# To add another pre-activated getty, place another symlink for instantiating another getty in the /etc/systemd/system/getty.target.wants/ directory:
+ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@ttyX.service
+systemctl start getty@ttyX.service
+
+# Set autologin for the tty11
+sudo systemctl edit getty@tty11
+	[Service]
+	ExecStart=
+	ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM
+
+# If instead you just want to not type your username replace --autologin <username> with --skip-login --login-options <username>
+
+
+
+#### MPD ####
+
+# MPD has a bug where at startup it will take sometime to launch while checking the database and because the systemd process is waiting for an answer
+# it will mark it as failed and kill it, so need to create a new mpd.service
+sudo cp /usr/lib/systemd/user/mpd.service ~/.config/systemd/user/mpd-fix.service
+# Open the new service and change the Type from notify to simple
+vim ~/.config/systemd/user/mpd-fix.service
+	Type=simple
+
+# Now create a yams user service
+vim /home/leptope/.config/systemd/user/yams.service
+	[Unit]
+	Description=yams
+	# You should use mpd as a systemd user service to ensure yams starts up after it. See the following link for more info:
+	# https://wiki.archlinux.org/index.php/Music_Player_Daemon#Autostart_with_systemd
+	After=mpd.service
+
+	[Service]
+	Type=simple
+	Environment="NON_INTERACTIVE=1"
+	ExecStart=/usr/bin/python3 -m /usr/bin/yams -N
+
+	[Install]
+	WantedBy=default.target
+
+
+# Enable the mpd and yams services for user space
+systemctl --user enable mpd-fix.service
+systemctl --user enable yams.service
+
+
+
+#### MOUNTING NAS ####
+
+sudo vim /etc/fstab
+	# 192.168.1.4:/folder/path/to/mount
+	192.168.1.4:/folder/path/to/mount	/path/where/to/mount	nfs	rw,_netdev,auto,x-systemd.automount,x-systemd.mount-timeout=10,timeo=14,x-systemd.idle-timeout=1min,vers=4.1,bg	0 0
+
+# Specify vers=4.1 because my NAS works with that. It doesn't affect if we don't put it but it skips attempts if we do.
+
+
+
+#### WI-F NETWORK POWERSAVING OFF ####
+
+# Make sure there is no file already for this
+ls /etc/NetworkManager/conf.d/
+
+sudo vim /etc/NetworkManager/conf.d/wifi-powersave-off.conf
+	[connection]
+	# Values are 0 (use default), 1 (ignore/don't touch), 2 (disable) or 3 (enable).
+	wifi.powersave = 2
+
+# And now restart the service
+systemctl restart NetworkManager
+
+
+
+#### BUILDING MPV FOR RASPBERRY ####
+
+# Probably its better to just do , even if just to not have to compile for +1h
+sudo pacman -S mpv
+# But i don't know yet
+
+sudo pacman -S go
+go get -tags=raspberry github.com/remogatto/egl
