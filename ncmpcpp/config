@@ -22,7 +22,7 @@ alternative_ui_separator_color = 		"cyan"
 
 
 # Formato de canción:
-song_columns_list_format = 				"$L (7)[white]{n} $1│$7 (30)[magenta]{a} $1│$7 (30)[white]{b} $1│$7 (30)[magenta]{t} $1│$7 (10)[white]{l}"
+song_columns_list_format = 				"$L (7)[white]{n} $1│$7 (30)[magenta]{a} $1│$7 (30)[white]{t} $1│$7 (30)[magenta]{b} $1│$7 (10)[white]{l}"
 now_playing_prefix = 					"$b$8»$2»$4»$3» "
 centered_cursor = 						"no"
 cyclic_scrolling = 						"yes"
